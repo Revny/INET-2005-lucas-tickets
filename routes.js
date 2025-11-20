@@ -7,11 +7,11 @@ const router = express.Router();
 const dbConnectionString = process.env.DB_CONNECTION_STRING;
 
 router.get('/', async (req, res) => {
-    await sql.connect("Server=tcp", "nscc-033243-sql-server.database.windows.net", "1433;Initial", "Catalog=Nscc-0334453-sql-database;Persist", "Security", "Info=False;User", "ID=nsccadmin;Password=Admin123" , ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection", "Timeout=30;");
-const result = await sql.query`SELECT a.[show.id], a.[title] as showtitle, a.[description], a.[filename], a.[createdate] a.[location], a.[owner], b.[catagoryid], b.[title] 
+    await sql.connect(dbConnectionString);
+const result = await sql.query`SELECT a.[Show.Id], a.[Title], a.[Description], a.[Filename], a.[Createdate] [Location], a.[Owner], b.[CatagoryID], b.[Title] 
 from [dbo].[shows] a
 INNER JOIN [dbo].[category] b
-ON .a[categoryID] = b.[categoryID]
+ON .a[CategoryID] = b.[CategoryID]
 ORDER BY a.[createdate] DESC`;
 res.json(result.recordset);
 })
@@ -21,11 +21,11 @@ router.get('/:id',async (req,res) => {
         res.status(400).send("invaild show ID ");
         return;
     }
-    await sql.connect("Server=tcp", "nscc-033243-sql-server.database.windows.net", "1433;Initial", "Catalog=Nscc-0334453-sql-database;Persist", "Security", "Info=False;User", "ID=nsccadmin;Password=",  "Admin123" , ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection", "Timeout=30;");
-    const result = await sql.query`SELECT a.[show.id], a.[title] as showtitle, a.[description], a.[filename], a.[createdate] a.[location], a.[owner], b.[catagoryid], b.[title] 
+    await sql.connect(dbConnectionString);
+    const result = await sql.query`SELECT a.[Show.Id], a.[Title], a.[Description], a.[Filename], a.[Createdate] [Location], a.[Owner], b.[CatagoryID], b.[Title] 
 from [dbo].[shows] a
-INNER JOIN [dbo].[category] b
-ON .a[categoryID] = b.[categoryID]
+INNER JOIN [dbo].[Category] b
+ON .a[CategoryID] = b.[CategoryID]
 WHERE a.[ShowId] = ${id}`;
 if(result.recordset.length === 0) {
         res.status(404).json({ message: 'show not found.'});        
@@ -35,16 +35,16 @@ if(result.recordset.length === 0) {
     }
 })
 router.post('/', async (req, res) => {
-    const photo = req.body;
+    const show = req.body;
 
     
 
-    await sql.connect("Server=tcp", "nscc-033243-sql-server.database.windows.net", "1433;Initial", "Catalog=Nscc-0334453-sql-database;Persist", "Security", "Info=False;User", "ID=nsccadmin;Password=",  "Admin123" , ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection", "Timeout=30;");
+    await sql.connect(dbConnectionString);
 
     const result = await sql.query`INSERT INTO [dbo].[Payment] 
-        (Body, Author, CreateDate, ShowId) 
+        (Body, Author, CreateDate, ShowID) 
         VALUES 
-        (${Show.Body}, ${Show.Author}, GETDATE(), ${Show.ShowId})`;
+        (${show.Body}, ${show.Author}, GETDATE(), ${show.ShowID})`;
 
     res.json({ message: 'Payment added successfully.'});
 });
